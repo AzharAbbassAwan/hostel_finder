@@ -56,10 +56,9 @@ const ChangePasswordForm = ({ onSuccess }: { onSuccess: () => void }) => {
       });
   
       // Send the form data to the backend (assuming `updatePassword` is your API function)
-      const { password } = data;
       const formData = new FormData();
-      formData.append("password", password);
-      const response = await UpdatePassword(new FormData()); // Pass the actual FormData object if needed
+      formData.append("password", data.password);
+      const response = await UpdatePassword(formData); // Pass the actual FormData object if needed
   
       // Handle the backend response
       if (response.status === 200) {
