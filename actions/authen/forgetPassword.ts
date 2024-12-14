@@ -2,6 +2,9 @@
 import { sendEmail } from "@/helpers/email";
 import prismadb from "@/lib/prisma";
 import { generateOTP } from "@/lib/utils";
+import { sendOtp } from "../nodemailer/emailTemplates";
+import { cookies } from "next/headers";
+
 
 export async function ForgetPassword(formData: FormData) {
   try {
@@ -38,22 +41,26 @@ export async function ForgetPassword(formData: FormData) {
     });
 
     // Send OTP via email
-    await sendEmail({
-      from: "alishahaman652@gmail.com",
-      to: email,
-      subject: "Confirm OTP",
-      text: "hello world",
-    });
+    // await sendEmail({
+    //   from: "alishahaman652@gmail.com",
+    //   to: email,
+    //   subject: "Confirm OTP",
+    //   text: "hello world",
+    // });
 
+    cookies().set("usrEmail", email, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          maxAge: 60 * 60,
+          sameSite: "strict",
+          path: "/",
+        });
+
+    const mailReponse = await sendOtp(email, otp);
     return {
       status: 200,
       success: true,
-      message: `We have sent an OTP code to your email address ${
-        existingUser.email
-      }`,
-      data: {
-        email: existingUser.email,
-      },
+      message: mailReponse,
     };
   } catch (error) {
     console.error("ForgetPassword error:", error);
